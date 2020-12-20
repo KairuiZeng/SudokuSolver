@@ -1,0 +1,22 @@
+{
+  "name": "sudoku-solver",
+  "version": "1.0.0",
+  "description": "Program that solves Sudoku puzzles generated from https://sudoku.com",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KairuiZeng/SudokuSolver.git"
+  },
+  "author": "Kairui Zeng",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/KairuiZeng/SudokuSolver/issues"
+  },
+  "homepage": "https://github.com/KairuiZeng/SudokuSolver#readme",
+  "dependencies": {
+    "puppeteer": "^5.5.0"
+  }
+}
