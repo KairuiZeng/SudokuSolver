@@ -1,4 +1,8 @@
 const { generateSudokuPuzzle } = require('./puzzleGenerator');
 
-generateSudokuPuzzle();
-console.log('hi?');
+async function main() {
+  const sudokuPuzzle = await generateSudokuPuzzle();
+  console.dir(sudokuPuzzle, {depth: 2});
+}
+
+main();
