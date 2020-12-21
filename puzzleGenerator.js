@@ -39,7 +39,7 @@ async function blacklistURLs(page) {
     });
 }
 
-// Sudoku array will be fetched so that unfilled cells are labelled as -1, stored as an array of arrays of integers
+// Sudoku array will be fetched so that unfilled cells are labelled as 0, stored as an array of arrays of integers
 async function fetchSudokuArray(page) {
   const html = await page.evaluate(() => document.body.innerHTML);
   const $ = cheerio.load(html);
@@ -57,21 +57,35 @@ async function fetchSudokuArray(page) {
         const number = numberSVGPaths.indexOf(numPath) + 1;
         return number;
       }
-      return -1;
+      return 0;
     })
     .toArray();
   
   return sudoku;
 }
 
+async function formatSudoku(puzzle) {
+  if (puzzle.length != 81) {
+    throw Error('Sudoku puzzle was not scraped correctly from website');
+  }
+
+  const formattedArray = [];
+  for (let count = 9; count; --count) {
+    const row = (9 - count) * 9;
+    formattedArray.push(puzzle.slice(row, row+9));
+  }
+
+  return formattedArray;
+};
+
 async function generateSudokuPuzzle() {
-  const browser = await puppeteer.launch({
+  const browser = await puppeteer.launch(/*{
     headless: false,
     defaultViewport: {
       width: 1980,
       height: 1080,
-    }
-  });
+    },
+  }*/);
 
   try {
     // Start up puppeteer instance
@@ -81,20 +95,19 @@ async function generateSudokuPuzzle() {
     await page.goto('https://sudoku.com/');
     await page.waitForSelector('#game');
 
-    // Scrape data for puzzle generated
+    // Scrape data for puzzle generated as 1D array of integers
     const sudoku = await fetchSudokuArray(page);
-    return sudoku;
+
+    // Close puppeteer instance
+    await browser.close();
+
+    // Format into array of arrays of integers
+    const formattedSudoku = await formatSudoku(sudoku);
+    return formattedSudoku;
   }
   catch (error) {
     console.log(error);
   }
-  
-  // Close puppeteer instance
-  await browser.close();
 }
 
 module.exports = { generateSudokuPuzzle };
-
-
-// testing
-generateSudokuPuzzle();
