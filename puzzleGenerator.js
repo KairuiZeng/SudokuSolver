@@ -45,7 +45,6 @@ async function blacklistURLs(page) {
 async function fetchSudokuArray(page) {
   const html = await page.evaluate(() => document.body.innerHTML);
   const $ = cheerio.load(html);
-  console.log('test');
   const sudoku = $(sudokuPuzzleSelector)
     .map((_, cell) => {
       if ($(cell).hasClass('game-value')) {
@@ -62,7 +61,7 @@ async function fetchSudokuArray(page) {
       return 0;
     })
     .toArray();
-  
+
   return sudoku;
 }
 
@@ -95,7 +94,7 @@ async function generateSudokuPuzzle() {
     const page = await browser.newPage();
     await blacklistURLs(page);
     await page.goto('https://sudoku.com/');
-    await page.waitForSelector('#game');
+    await page.waitForSelector('#game .game-value');
 
     // Scrape data for puzzle generated as 1D array of integers
     const sudoku = await fetchSudokuArray(page);
