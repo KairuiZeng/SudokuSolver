@@ -1,12 +1,13 @@
 'use strict';
 
 const { generateSudokuPuzzle } = require('./puzzleGenerator');
-const { getFilledRowNumbers , getFilledColumnNumbers } = require('./puzzleSolver');
+const { solve } = require('./puzzleSolver');
 
 async function main() {
   const sudokuPuzzle = await generateSudokuPuzzle();
-  console.log(sudokuPuzzle);
   console.table(sudokuPuzzle);
+  console.log('Solving puzzle...');
+  console.table(solve(sudokuPuzzle));
 }
 
 main();
