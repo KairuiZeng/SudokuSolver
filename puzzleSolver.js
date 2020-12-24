@@ -174,9 +174,8 @@ function getLocations(puzzle, emptyCells, value) {
   return possibleLocations;
 }
 
-function methodOneSweep(puzzle) {
+function methodOneSolve(puzzle) {
   let updateMade;
-  const ogPuzzle = puzzle;
 
   do {
     updateMade = false;
@@ -186,26 +185,66 @@ function methodOneSweep(puzzle) {
   } while (updateMade);
 
   if (puzzleCompleted(puzzle)) {
-    console.log('Puzzle completed!');
+    return puzzle;
   }
   else {
-    console.log('Method 1 sweep was not enough');
-    console.log(ogPuzzle);
+    console.log('First method for solving was not enough.');
+    return methodTwoSolve(puzzle);
   }
-  return puzzle;
 
   function fillForBlock(puzzle, block) {
-    let emptyCells = getEmptyBlockSpaces(puzzle, block); // [ [ 0, 0 ], [ 0, 1 ], [ 0, 2 ], [ 1, 1 ], [ 1, 2 ], [ 2, 0 ] ]
-    let presentNumbers = getBlockNumbers(puzzle, block); // [ 2, 6, 7 ]
+    let emptyCells = getEmptyBlockSpaces(puzzle, block);
+    let presentNumbers = getBlockNumbers(puzzle, block);
     for (let value = 1; value <= 9; ++value) {
       if (presentNumbers.indexOf(value) == -1) {
         const possibleLocations = getLocations(puzzle, emptyCells, value);
         if (possibleLocations.length == 1) {
+          console.log(`Found cell for value ${value} in ${block}.`);
           const updateRow = possibleLocations[0][0];
           const updateCol = possibleLocations[0][1];
           puzzle[updateRow][updateCol] = value;
           updateMade = true;
-          console.log(`Found cell for value ${value} in ${block}.`);
+        }
+      }
+    }
+    return puzzle;
+  }
+}
+
+function methodTwoSolve(puzzle) {
+  console.log('Puzzle received from method 1');
+  console.table(puzzle);
+  let updateMade;
+  // Check rows
+  puzzle = checkLine(puzzle, getRowNumbers);
+  // Check columns
+  puzzle = checkLine(puzzle, getColumnNumbers);
+
+  if (updateMade) {
+    console.log('Second method for solving found new values.');
+    return methodOneSolve(puzzle);
+  }
+  else {
+    console.log('Second method for solving was not enough.');
+    return puzzle;
+  }
+  
+  // lineFunction takes in getRowNumbers or getColumnNumbers
+  // Line represents a straight line of 9 cells in the Sudoku puzzle
+  function checkLine(puzzle, lineFunction) {
+    let value;
+    for (let index = 0; index < 9; ++index) {
+      const valuesList = lineFunction(puzzle, index);
+      if (valuesList.length == 8) {
+        console.log('Found a line that can be completed!');
+        for (let count = 1; count <= 9; ++count) {
+          if (valuesList.indexOf(count) == -1) value = count;
+        }
+        for (let count = 0; count < 9; ++count) {
+          if (!puzzle[index][count]) {
+            puzzle[index][count] = value;
+            updateMade = true;
+          }
         }
       }
     }
@@ -214,10 +253,10 @@ function methodOneSweep(puzzle) {
 }
 
 function solve(puzzle) {
-  return methodOneSweep(puzzle);
+  return methodOneSolve(puzzle);
 }
 
-module.exports = { solve };
+module.exports = { solve , puzzleCompleted , verifySudoku };
 
 // Testing
 const examplePuzzle = [
@@ -245,9 +284,9 @@ const method1Fail = [
 ];
 
 async function test() {
-  console.log(verifySudoku(examplePuzzle));
-  console.table(examplePuzzle);
-  console.table(methodOneSweep(examplePuzzle));
+  // console.log(verifySudoku(examplePuzzle));
+  // console.table(examplePuzzle);
+  console.table(methodOneSolve(method1Fail));
   
 }
 
