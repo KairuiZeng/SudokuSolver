@@ -252,6 +252,66 @@ function methodTwoSolve(puzzle) {
   }
 }
 
+function sameRow(locations) {
+
+}
+
+function sameColumn(locations) {
+
+}
+
+function eliminatedRow(locations) {
+
+}
+
+function eliminatedColumn(locations) {
+
+}
+
+function test(puzzle, block) {
+  let emptyCells = getEmptyBlockSpaces(puzzle, block);
+  let presentNumbers = getBlockNumbers(puzzle, block);
+  for (let value = 1; value <= 9; ++value) {
+    if (presentNumbers.indexOf(value) == -1) {
+      const possibleLocations = getLocations(puzzle, emptyCells, value);
+      if (sameRow(possibleLocations)) {
+
+      }
+      else if (sameColumn(possibleLocations)) {
+
+      }
+      if (eliminatedRow(possibleLocations)) {
+
+      }
+      else if (eliminatedColumn(possibleLocations)) {
+        
+      }
+    }
+  }
+  return puzzle;
+}
+
+function analyzeSubsections(puzzle) {
+  const singleLineSubsections = []; 
+  const exhaustedSubsections = [];
+}
+
+function complexSolve(puzzle) {
+  console.log('Simple solve could not complete the puzzle.');
+  console.log('Puzzle sent as: ');
+  console.table(puzzle);
+  console.log('Attempting complex solve...');
+
+  const { singleLineSubsections, exhaustedSubsections, exhaustedLines } = analyzeSubsections(puzzle);
+}
+
+function bruteForceSolve(puzzle) {
+  console.log('Complex solve could not complete the puzzle.');
+  console.log('Puzzle sent as: ');
+  console.table(puzzle);
+  console.log('Attempting to brute force...');
+}
+
 function solve(puzzle) {
   return methodOneSolve(puzzle);
 }

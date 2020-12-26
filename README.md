@@ -23,6 +23,9 @@ A more advanced rule, the program will look at subsections of blocks that must c
 i.e. A row of 3 cells could contain within it: 1, 2, 3, but the specific location is unknown. That row would then not be considered for finding the location for the value 4.
 
 Method 5:
+A more advanced rule, if a value can only appear in 2 rows/columns for 2 blocks in a row/column of blocks, the last block's value must appear in the 3rd row.
+
+Method 5:
 A brute force method completely reliant on the machine, it will determine the remaining values possibly located in a cell, and attempt to solve it with that value filled in, if successful, it will return the puzzle, if not, it will try a different value and exhaust all possible paths.
 The aim is that hopefully by the time methods 1-4 are exhausted, method 5 will not have too many possible paths available.
 
