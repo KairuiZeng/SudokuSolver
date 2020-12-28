@@ -260,14 +260,6 @@ function sameColumn(locations) {
 
 }
 
-function eliminatedRow(locations) {
-
-}
-
-function eliminatedColumn(locations) {
-
-}
-
 function test(puzzle, block) {
   let emptyCells = getEmptyBlockSpaces(puzzle, block);
   let presentNumbers = getBlockNumbers(puzzle, block);
@@ -280,20 +272,70 @@ function test(puzzle, block) {
       else if (sameColumn(possibleLocations)) {
 
       }
-      if (eliminatedRow(possibleLocations)) {
-
-      }
-      else if (eliminatedColumn(possibleLocations)) {
-        
-      }
     }
   }
   return puzzle;
 }
 
+function initializeIndexToBlockMap() {
+  const map = {};
+  for (let index = 0; index < 9; ++index) {
+    map[index] = [];
+  }
+  return map;
+}
+
+function getRowSubsections(puzzle) {
+  const rowSubsections = initializeIndexToBlockMap();
+  const colSubsections = initializeIndexToBlockMap();
+  for (const [key, value] of Object.entries(blockDirection)) {
+    const block = value;
+    let emptyCells = getEmptyBlockSpaces(puzzle, block);
+    let presentNumbers = getBlockNumbers(puzzle, block);
+    for (let value = 1; value <= 9; ++value) {
+      if (presentNumbers.indexOf(value) == -1) {
+        const possibleLocations = getLocations(puzzle, emptyCells, value);
+        if (possibleLocations.length < 2) {
+          continue;
+        }
+        let sameRow = true;
+        let sameCol = true;
+        let rowNum, colNum, rowIndex, colIndex;
+        for (const coords of possibleLocations) {
+          rowIndex = coords[0];
+          colIndex = coords[1];
+          if (!rowNum) {
+            rowNum = rowIndex;
+          }
+          else if (rowNum != rowIndex) {
+            sameRow = false;
+          }
+          if (!colNum) {
+            colNum = colIndex;
+          }
+          else if (colNum != colIndex) {
+            sameCol = false;
+          }
+        }
+        if (sameRow) {
+          rowSubsections[rowIndex].push({value, block});
+        }
+        if (sameCol) {
+          colSubsections[colIndex].push({value, block});
+        }
+      }
+    }
+  }
+  console.log('yeet');
+  return {
+    rowSubsections,
+    colSubsections,
+  };
+}
+
 function analyzeSubsections(puzzle) {
-  const singleLineSubsections = []; 
-  const exhaustedSubsections = [];
+  let rowSubsections = getRowSubsections(puzzle); 
+  let colSubsections = getColSubsections(puzzle);
 }
 
 function complexSolve(puzzle) {
@@ -302,7 +344,7 @@ function complexSolve(puzzle) {
   console.table(puzzle);
   console.log('Attempting complex solve...');
 
-  const { singleLineSubsections, exhaustedSubsections, exhaustedLines } = analyzeSubsections(puzzle);
+  const { rowSubsections, colSubsections } = analyzeSubsections(puzzle);
 }
 
 function bruteForceSolve(puzzle) {
@@ -351,7 +393,7 @@ async function test() {
 }
 
 // test();
-
+getRowSubsections(method1Fail);
 /*
 ┌─────────┬───┬───┬───┬───┬───┬───┬───┬───┬───┐
 │ (index) │ 0 │ 1 │ 2 │ 3 │ 4 │ 5 │ 6 │ 7 │ 8 │
