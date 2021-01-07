@@ -9,17 +9,17 @@ async function main() {
   console.log(sudokuPuzzle);
   console.log('Solving puzzle...\n\n\n');
   const result = solve(sudokuPuzzle);
-  if (puzzleCompleted(result)) {
-    if (verifySudoku(puzzle)) {
-      console.log('Puzzle completed!');
-    }
-    else {
-      console.log('An error occurred during solving.');
-    }
-  }
-  else {
-    console.log('Puzzle is unfinished.');
-  }
+  // if (puzzleCompleted(result)) {
+  //   if (verifySudoku(puzzle)) {
+  //     console.log('Puzzle completed!');
+  //   }
+  //   else {
+  //     console.log('An error occurred during solving.');
+  //   }
+  // }
+  // else {
+  //   console.log('Puzzle is unfinished.');
+  // }
   console.table(result);
 }
 
