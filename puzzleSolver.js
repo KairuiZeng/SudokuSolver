@@ -169,14 +169,39 @@ function getLocations(puzzle, emptyCells, value) {
   return possibleLocations;
 }
 
+function insertValue(puzzle, coords, value) {
+  puzzle[coords[0]][coords[1]] = value;
+  return puzzle;
+}
+
 function complete8Line(puzzle) {
-  for (const index = 0; index < 9; ++index) {
+  let updated = false;
+  for (let index = 0; index < 9; ++index) {
     const filledRow = getRowNumbers(puzzle, index);
-    const filledCol = getColumnNumbers(puzzle, index);
     if (filledRow.length == 8) {
-      for 
+      let value;
+      for (value = 1; filledRow.includes(value); ++value) {}
+      for (let colIndex = 0; colIndex < 0; ++colIndex) {
+        if (!puzzle[index][colIndex]) {
+          puzzle = insertValue(puzzle, [index, colIndex], value);
+        }
+      }
+    }
+    const filledCol = getColumnNumbers(puzzle, index);
+    if (filledCol.length == 8) {
+      let value;
+      for (value = 1; filledCol.includes(value); ++value) {}
+      for (let rowIndex = 0; rowIndex < 0; ++rowIndex) {
+        if (!puzzle[rowIndex][index]) {
+          puzzle = insertValue(puzzle, [rowIndex, index], value);
+        }
+      }
     }
   }
+  if (!updated) {
+    return false;
+  }
+  return puzzle;
 }
 
 function eliminateByRelativeLine(puzzle, emptyCells, value) {
@@ -206,19 +231,21 @@ function solveByRules(puzzle) {
   }
   
   for (const blockDir of Object.values(blockDirection)) {
-    let emptyCells = getEmptyBlockSpaces(puzzle, blockDir);
-    let usedNumbers = getUsedBlockNumbers(puzzle, blockDir);
-    for (const value = 1; (value <= 9) || (!usedNumbers.includes(value)); ++value) {
-      emptyCells = eliminateByRelativeLine(puzzle, emptyCells, value);
-      if (!emptyCells.length) {
-        console.log('Something went wrong.');
-      }
-      else if (emptyCells.length == 1) {
-        isUpdated = true;
-        puzzle = insertValue(puzzle, emptyCells[0], value);
-      }
-      else {
+    let usedNumbers = getFilledBlockCells(puzzle, blockDir);
+    for (let value = 1; value <= 9; ++value) {
+      if (!usedNumbers.includes(value)) {
+        let emptyCells = getEmptyBlockCells(puzzle, blockDir);
+        emptyCells = eliminateByRelativeLine(puzzle, emptyCells, value);
+        if (!emptyCells.length) {
+          console.log('Something went wrong.');
+        }
+        else if (emptyCells.length == 1) {
+          isUpdated = true;
+          puzzle = insertValue(puzzle, emptyCells[0], value);
+        }
+        else {
 
+        }
       }
     }
   }
@@ -243,7 +270,7 @@ function initializeIndexToBlockMap() {
 function getRowSubsections(puzzle) {
   const rowSubsections = initializeIndexToBlockMap();
   const colSubsections = initializeIndexToBlockMap();
-  for (const [key, value] of Object.entries(blockDirection)) {
+  for (const value of Object.values(blockDirection)) {
     const block = value;
     let emptyCells = getEmptyBlockCells(puzzle, block);
     let presentNumbers = getFilledBlockCells(puzzle, block);
@@ -332,6 +359,8 @@ async function test() {
   
 }
 
+console.table(solveByRules(examplePuzzle));
+console.log('yuh');
 // test();
 // getRowSubsections(method1Fail);
 /*

@@ -23,4 +23,5 @@ async function main() {
   console.table(result);
 }
 
+console.log(env);
 main();
