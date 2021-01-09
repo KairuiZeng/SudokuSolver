@@ -4,6 +4,14 @@ const { generateSudokuPuzzle } = require('./puzzleGenerator');
 const { solve , puzzleCompleted, verifySudoku } = require('./puzzleSolver');
 
 async function main() {
+  if (process.env.npm_config_browsermode) {
+    console.log('Has not yet been implemented to solve in the browser.');
+  }
+  if (process.env.npm_config_difficulty) {
+    console.log('Has not yet been implemented to change difficulty of the puzzle.');
+    console.log('Difficulty would be set to:', process.env.npm_config_difficulty);
+  }
+  
   const sudokuPuzzle = await generateSudokuPuzzle();
   console.table(sudokuPuzzle);
   console.log(sudokuPuzzle);
@@ -23,5 +31,4 @@ async function main() {
   console.table(result);
 }
 
-console.log(env);
 main();
