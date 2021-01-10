@@ -12,6 +12,11 @@ const blockDirection = {
   SE: 'SE',
 }
 
+const solveState = {
+  simple: 'simple',
+  complex: 'complex',
+};
+
 // rowIndex 0 to 8
 // Function servers 2 purposes:
 // 1. Returns all unique values within a row of the puzzle
@@ -234,7 +239,23 @@ function analyzeEmptyCells(emptyCells) {
   return { sameRow, sameCol, rowNum, colNum };
 }
 
-function solveByRules(puzzle) {
+function eliminateBySubsections(emptyCells, block, value, rowSubsections, colSubsections) {
+  for (let count = 0; count < emptyCells.length; ++count) {
+    const currentLocation = emptyCells[count];
+    const rowIndex = currentLocation[0];
+    const colIndex = currentLocation[1];
+
+    const presentRowValues = rowSubsections[rowIndex].filter(section => (section.value == value && section.blockDir != block));
+    const presentColValues = colSubsections[colIndex].filter(section => (section.value == value && section.blockDir != block));
+    if (presentRowValues.length || presentColValues.length) {
+      emptyCells.splice(count, 1);
+      --count;
+    }
+  }
+  return emptyCells;
+}
+
+function solveByRules(puzzle, rowSubsections, colSubsections) {
   let isUpdated = false;
 
   const result = complete8Line(puzzle);
@@ -243,16 +264,17 @@ function solveByRules(puzzle) {
     isUpdated = true;
   }
 
-  const rowSubsections = initializeIndexToBlockMap();
-  const colSubsections = initializeIndexToBlockMap();
-
   for (const blockDir of Object.values(blockDirection)) {
     let usedNumbers = getFilledBlockCells(puzzle, blockDir);
     for (let value = 1; value <= 9; ++value) {
       if (!usedNumbers.includes(value)) {
+
         let emptyCells = getEmptyBlockCells(puzzle, blockDir);
         emptyCells = eliminateByRelativeLine(puzzle, emptyCells, value);
-        // emptyCells = eliminateBySubsections(emptyCells, blockDir, value, rowSubsections, colSubsections);
+        if (emptyCells.length >= 2) {
+          emptyCells = eliminateBySubsections(emptyCells, blockDir, value, rowSubsections, colSubsections);
+        }
+
         if (!emptyCells.length) {
           console.log('Something went wrong.');
         }
@@ -278,7 +300,7 @@ function solveByRules(puzzle) {
   }
 
   if (isUpdated) {
-    return solveByRules(puzzle);
+    return solveByRules(puzzle, rowSubsections, colSubsections);
   }
   return solveByForce(puzzle);
 }
@@ -292,7 +314,9 @@ function solveByForce(puzzle) {
 
 function solve(puzzle) {
   console.log('Attempting to solve with Sudoku rules...');
-  return solveByRules(puzzle);
+  const rowSubsections = initializeIndexToBlockMap();
+  const colSubsections = initializeIndexToBlockMap();
+  return solveByRules(puzzle, rowSubsections, colSubsections);
 }
 
 module.exports = { solve , puzzleCompleted , verifySudoku };
@@ -325,12 +349,11 @@ const method1Fail = [
 async function test() {
   // console.log(verifySudoku(examplePuzzle));
   // console.table(examplePuzzle);
-  console.table(methodOneSolve(method1Fail));
+  console.table(solve(method1Fail));
   
 }
 
-console.table(solveByRules(examplePuzzle));
-console.log('yuh');
+console.table(solve(method1Fail));
 // test();
 // getRowSubsections(method1Fail);
 /*
