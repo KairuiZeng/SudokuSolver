@@ -66,6 +66,14 @@ function puzzleCompleted(puzzle) {
   return true;
 }
 
+function initializeIndexToBlockMap() {
+  const map = {};
+  for (let index = 0; index < 9; ++index) {
+    map[index] = [];
+  }
+  return map;
+}
+
 // Each block uses a cardinal direction as an identifier
 /*
 [ NW ][ N ][ NE ]
@@ -152,23 +160,6 @@ function getEmptyBlockCells(puzzle, block) {
   return filled;
 }
 
-function getLocations(puzzle, emptyCells, value) {
-  const possibleLocations = [];
-
-  const iterations = emptyCells.length;
-  for (let count = 0; count < iterations; ++count) {
-    const currentLocation = emptyCells[count];
-    const rowIndex = currentLocation[0];
-    const colIndex = currentLocation[1];
-    const presentRowValues = getRowNumbers(puzzle, rowIndex);
-    const presentColValues = getColumnNumbers(puzzle, colIndex);
-    if (presentRowValues.indexOf(value) == -1 && presentColValues.indexOf(value) == -1) {
-      possibleLocations.push(currentLocation);
-    }
-  }
-  return possibleLocations;
-}
-
 function insertValue(puzzle, coords, value) {
   puzzle[coords[0]][coords[1]] = value;
   return puzzle;
@@ -220,8 +211,30 @@ function eliminateByRelativeLine(puzzle, emptyCells, value) {
   return emptyCells;
 }
 
+function analyzeEmptyCells(emptyCells) {
+  let sameRow = true;
+  let sameCol = true;
+  let rowNum, colNum, rowIndex, colIndex;
+  for (const cell of emptyCells) {
+    rowIndex = cell[0];
+    colIndex = cell[1];
+    if (rowNum == null) { // can't use !rowNum, because 0 index fulfills that condition
+      rowNum = rowIndex;
+    }
+    else if (rowNum != rowIndex) {
+      sameRow = false;
+    }
+    if (colNum == null) {
+      colNum = colIndex;
+    }
+    else if (colNum != colIndex) {
+      sameCol = false;
+    }
+  }
+  return { sameRow, sameCol, rowNum, colNum };
+}
+
 function solveByRules(puzzle) {
-  console.log('Attempting to solve with Sudoku rules...');
   let isUpdated = false;
 
   const result = complete8Line(puzzle);
@@ -229,13 +242,17 @@ function solveByRules(puzzle) {
     puzzle = result;
     isUpdated = true;
   }
-  
+
+  const rowSubsections = initializeIndexToBlockMap();
+  const colSubsections = initializeIndexToBlockMap();
+
   for (const blockDir of Object.values(blockDirection)) {
     let usedNumbers = getFilledBlockCells(puzzle, blockDir);
     for (let value = 1; value <= 9; ++value) {
       if (!usedNumbers.includes(value)) {
         let emptyCells = getEmptyBlockCells(puzzle, blockDir);
         emptyCells = eliminateByRelativeLine(puzzle, emptyCells, value);
+        // emptyCells = eliminateBySubsections(emptyCells, blockDir, value, rowSubsections, colSubsections);
         if (!emptyCells.length) {
           console.log('Something went wrong.');
         }
@@ -244,11 +261,18 @@ function solveByRules(puzzle) {
           puzzle = insertValue(puzzle, emptyCells[0], value);
         }
         else {
-
+          const results = analyzeEmptyCells(emptyCells);
+          if (results.sameRow) {
+            rowSubsections[results.rowNum].push({value, blockDir});
+          }
+          if (results.sameCol) {
+            colSubsections[results.colNum].push({value, blockDir});
+          }
         }
       }
     }
   }
+
   if (puzzleCompleted(puzzle) && verifySudoku(puzzle)) {
     return puzzle;
   }
@@ -259,61 +283,6 @@ function solveByRules(puzzle) {
   return solveByForce(puzzle);
 }
 
-function initializeIndexToBlockMap() {
-  const map = {};
-  for (let index = 0; index < 9; ++index) {
-    map[index] = [];
-  }
-  return map;
-}
-
-function getRowSubsections(puzzle) {
-  const rowSubsections = initializeIndexToBlockMap();
-  const colSubsections = initializeIndexToBlockMap();
-  for (const value of Object.values(blockDirection)) {
-    const block = value;
-    let emptyCells = getEmptyBlockCells(puzzle, block);
-    let presentNumbers = getFilledBlockCells(puzzle, block);
-    for (let value = 1; value <= 9; ++value) {
-      if (presentNumbers.indexOf(value) == -1) {
-        const possibleLocations = getLocations(puzzle, emptyCells, value);
-        if (possibleLocations.length < 2) {
-          continue;
-        }
-        let sameRow = true;
-        let sameCol = true;
-        let rowNum, colNum, rowIndex, colIndex;
-        for (const coords of possibleLocations) {
-          rowIndex = coords[0];
-          colIndex = coords[1];
-          if (!rowNum) {
-            rowNum = rowIndex;
-          }
-          else if (rowNum != rowIndex) {
-            sameRow = false;
-          }
-          if (!colNum) {
-            colNum = colIndex;
-          }
-          else if (colNum != colIndex) {
-            sameCol = false;
-          }
-        }
-        if (sameRow) {
-          rowSubsections[rowIndex].push({value, block});
-        }
-        if (sameCol) {
-          colSubsections[colIndex].push({value, block});
-        }
-      }
-    }
-  }
-  return {
-    rowSubsections,
-    colSubsections,
-  };
-}
-
 function solveByForce(puzzle) {
   console.log('Solving with currently implemented rules was not enough.');
   console.log('Puzzle sent as: ');
@@ -322,6 +291,7 @@ function solveByForce(puzzle) {
 }
 
 function solve(puzzle) {
+  console.log('Attempting to solve with Sudoku rules...');
   return solveByRules(puzzle);
 }
 
