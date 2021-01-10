@@ -346,14 +346,7 @@ const method1Fail = [
   [3, 8, 7, 1, 4, 5, 9, 0, 0],
 ];
 
-async function test() {
-  // console.log(verifySudoku(examplePuzzle));
-  // console.table(examplePuzzle);
-  console.table(solve(method1Fail));
-  
-}
-
-console.table(solve(method1Fail));
+// console.table(solve(method1Fail));
 // test();
 // getRowSubsections(method1Fail);
 /*

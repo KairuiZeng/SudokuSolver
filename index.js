@@ -8,11 +8,11 @@ async function main() {
     console.log('Has not yet been implemented to solve in the browser.');
   }
   if (process.env.npm_config_difficulty) {
-    console.log('Has not yet been implemented to change difficulty of the puzzle.');
-    console.log('Difficulty would be set to:', process.env.npm_config_difficulty);
+    console.log('A specific difficult setting has been chosen.');
+    console.log(`Difficulty will be set to: ${process.env.npm_config_difficulty}.`);
   }
   
-  const sudokuPuzzle = await generateSudokuPuzzle();
+  const sudokuPuzzle = await generateSudokuPuzzle(process.env.npm_config_difficulty);
   console.table(sudokuPuzzle);
   console.log(sudokuPuzzle);
   console.log('Solving puzzle...\n\n\n');

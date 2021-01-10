@@ -79,21 +79,28 @@ async function formatSudoku(puzzle) {
   return formattedArray;
 };
 
-async function generateSudokuPuzzle() {
-  const browser = await puppeteer.launch(/*{
-    headless: false,
-    defaultViewport: {
-      width: 1980,
-      height: 1080,
-    },
-  }*/);
+async function generateSudokuPuzzle(difficulty) {
+  const browser = await puppeteer.launch(
+    // {
+    //   headless: false,
+    //   defaultViewport: {
+    //     width: 1980,
+    //     height: 1080,
+    //   },
+    // }
+  );
 
   try {
     // Start up puppeteer instance
     await browser.userAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36');
     const page = await browser.newPage();
     await blacklistURLs(page);
-    await page.goto('https://sudoku.com/');
+    if (difficulty) {
+      await page.goto(`https://sudoku.com/${difficulty}/`);
+    }
+    else {
+      await page.goto('https://sudoku.com/');
+    }
     await page.waitForSelector('#game .game-value');
 
     // Scrape data for puzzle generated as 1D array of integers
