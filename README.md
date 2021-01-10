@@ -2,7 +2,8 @@
 
 In progress...
 
-This is an implementation of a Sudoku puzzle solving program.<br><br>
+This is an implementation of a Sudoku puzzle solving program. 
+Currently, it is capable of solving easy and medium level puzzles relying solely on heuristics.<br><br>
 #### Run npm start {options} to use the program
 #### Options:
 #### --browsermode to solve the Sudoku in the sudoku.com window
